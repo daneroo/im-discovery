@@ -73,21 +73,26 @@ async.parallel([
         pull.map((data) => {
           return data.toString('utf8').replace('\n', '')
         }),
-        pull.drain(console.log)
+        // pull.drain(console.log)
+        pull.drain(msg => {
+          console.log('<<', msg)
+        })
       )
 
       // heartbeat
+      const randInterval = Math.floor(Math.random() * 2000 + 1000)
+      console.log('interval', randInterval)
       setInterval(() => {
         const stamp = new Date().toISOString()
-        console.log('sending', stamp)
+        console.log('>>', stamp)
         p.push(stamp)
-      }, 3000)
+      }, randInterval)
 
       // echo stdin
       process.stdin.setEncoding('utf8')
       process.openStdin().on('data', (chunk) => {
         var data = chunk.toString()
-        console.log('sending', data)
+        console.log('>>', data)
         p.push(data)
       })
     })
