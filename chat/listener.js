@@ -1,9 +1,11 @@
 'use strict'
 
-const PeerId = require('peer-id')
-const PeerInfo = require('peer-info')
-// const Node = require('./libp2p-bundle.js')
-const Node = require('../../libp2p-ipfs-nodejs')
+const types = require('./types')
+const PeerId = types.PeerId
+const PeerInfo = types.PeerInfo
+
+const Node = require('./libp2p-ipfs-nodejs')
+
 const pull = require('pull-stream')
 const Pushable = require('pull-pushable')
 const p = Pushable()
@@ -13,7 +15,6 @@ PeerId.createFromJSON(require('./peer-id-listener'), (err, idListener) => {
     throw err
   }
   const peerListener = new PeerInfo(idListener)
-  // peerListener.multiaddr.add('/ip4/0.0.0.0/tcp/10333')
   peerListener.multiaddrs.add('/ip4/0.0.0.0/tcp/10333')
   const nodeListener = new Node(peerListener)
 
@@ -29,7 +30,7 @@ PeerId.createFromJSON(require('./peer-id-listener'), (err, idListener) => {
     }
 
     nodeListener.swarm.on('peer-mux-established', (peerInfo) => {
-      log('==')(`peer-mux-established: ${peerInfo.id.toB58String()}`)
+      log('==')(`peer-mux-established: peerInfo.id: ${peerInfo.id.toB58String()}`)
     })
 
     nodeListener.handle('/chat/1.0.0', (protocol, conn) => {

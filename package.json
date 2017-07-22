@@ -8,16 +8,8 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "async": "^2.5.0",
-    "ipfs": "^0.24.1",
-    "libp2p": "^0.10.0",
-    "libp2p-ipfs-nodejs": "^301.0.0",
-    "libp2p-mdns": "^0.7.1",
-    "libp2p-multiplex": "^0.4.4",
-    "libp2p-railing": "^0.5.2",
-    "libp2p-secio": "^0.6.8",
-    "libp2p-tcp": "^0.10.1",
+  "dependencies": {},
+  "devDependencies": {
     "standard": "^10.0.2"
   }
 }

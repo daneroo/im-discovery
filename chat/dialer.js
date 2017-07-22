@@ -1,10 +1,12 @@
 'use strict'
-/* eslint-disable no-console */
 
-const PeerId = require('peer-id')
-const PeerInfo = require('peer-info')
-// const Node = require('./libp2p-bundle.js')
-const Node = require('../../libp2p-ipfs-nodejs')
+const types = require('./types')
+const PeerId = types.PeerId
+const PeerInfo = types.PeerInfo
+
+// const Node = require('./libp2p-ipfs-nodejs')
+const Node = require('ipfs/src/core/runtime/libp2p-nodejs')
+
 const pull = require('pull-stream')
 const async = require('async')
 const Pushable = require('pull-pushable')
@@ -15,7 +17,7 @@ async.parallel([
   (callback) => {
     // PeerId from JSON
     // PeerId.createFromJSON(require('./peer-id-dialer'), (err, idDialer) => {
-    PeerId.create({bits: 2048}, (err, idDialer) => {
+    PeerId.create({ bits: 2048 }, (err, idDialer) => {
       if (err) {
         throw err
       }
@@ -34,9 +36,9 @@ async.parallel([
     })
   }
 ], (err, ids) => {
+  // got 2 PeerIds: [dialer,listener]
   if (err) throw err
   const peerDialer = new PeerInfo(ids[0])
-  // peerDialer.multiaddr.add('/ip4/0.0.0.0/tcp/0')
   peerDialer.multiaddrs.add('/ip4/0.0.0.0/tcp/0')
   const nodeDialer = new Node(peerDialer)
 
