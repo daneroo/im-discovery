@@ -4,7 +4,7 @@ const types = require('./types')
 const PeerId = types.PeerId
 const PeerInfo = types.PeerInfo
 
-const Node = require('./libp2p-ipfs-nodejs')
+const Node = require('ipfs/src/core/runtime/libp2p-nodejs')
 
 const pull = require('pull-stream')
 const Pushable = require('pull-pushable')
@@ -24,6 +24,8 @@ PeerId.createFromJSON(require('./peer-id-listener'), (err, idListener) => {
       console.log(direction + shortName, msg)
     }
   }
+  log('==')(`I am ${idListener.toB58String()}`)
+
   nodeListener.start((err) => {
     if (err) {
       throw err
@@ -53,23 +55,23 @@ PeerId.createFromJSON(require('./peer-id-listener'), (err, idListener) => {
       console.log('interval', randInterval)
       setInterval(() => {
         const stamp = new Date().toISOString()
+        const msg = stamp + ' from:' + shortName
         // console.log('>>', stamp)
-        log('>>')(stamp)
-        p.push(stamp)
+        log('>>')(msg)
+        p.push(msg)
       }, randInterval)
 
       process.stdin.setEncoding('utf8')
       process.openStdin().on('data', (chunk) => {
         var data = chunk.toString()
-        // console.log('>>', data)
         log('>>')(data)
         p.push(data)
       })
     })
 
-    console.log(`Listener ready (${shortName}), listening on:`)
+    log('==')('Listener ready, listening on:')
     peerListener.multiaddrs.forEach((ma) => {
-      console.log(ma.toString() + '/ipfs/' + idListener.toB58String())
+      log('==')(ma.toString() + '/ipfs/' + idListener.toB58String())
     })
   })
 })

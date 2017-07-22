@@ -4,7 +4,6 @@ const types = require('./types')
 const PeerId = types.PeerId
 const PeerInfo = types.PeerInfo
 
-// const Node = require('./libp2p-ipfs-nodejs')
 const Node = require('ipfs/src/core/runtime/libp2p-nodejs')
 
 const pull = require('pull-stream')
@@ -44,7 +43,6 @@ async.parallel([
 
   const peerListener = new PeerInfo(ids[1])
   idListener = ids[1]
-  // peerListener.multiaddr.add('/ip4/127.0.0.1/tcp/10333')
   peerListener.multiaddrs.add('/ip4/127.0.0.1/tcp/10333')
   nodeDialer.start((err) => {
     if (err) {
