@@ -46,17 +46,15 @@ PeerId.createFromJSON(require('./peer-id-listener'), (err, idListener) => {
         pull.map((data) => {
           return data.toString('utf8').replace('\n', '')
         }),
-        // pull.drain(console.log)
         pull.drain(log('<<'))
       )
 
       // heartbeat
       const randInterval = Math.floor(Math.random() * 2000 + 1000)
-      console.log('interval', randInterval)
+      log('==')(`pinging at interval: ${randInterval}`)
       setInterval(() => {
         const stamp = new Date().toISOString()
         const msg = stamp + ' from:' + shortName
-        // console.log('>>', stamp)
         log('>>')(msg)
         p.push(msg)
       }, randInterval)
