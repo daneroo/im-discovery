@@ -72,21 +72,25 @@ async.parallel([
       console.log('nodeA dialed to nodeB on protocol: /chat/1.0.0')
       console.log('Type a message and see what happens')
       // Write operation. Data sent as a buffer
+      // from pushable to connection
       pull(
         p,
         conn
       )
       // Sink, data converted from buffer to utf8 string
+      // from connection to local echo
       pull(
         conn,
         pull.map((data) => {
           return data.toString('utf8').replace('\n', '')
         }),
-        pull.drain(log('<<'))
+        pull.drain(log('<<'), () => {
+          console.log('*** DONE ***')
+        })
       )
 
       // heartbeat
-      const randInterval = Math.floor(Math.random() * 2000 + 1000)
+      const randInterval = Math.floor(Math.random() * 2000 + 5000)
       log('==')(`pinging at interval: ${randInterval}`)
       setInterval(() => {
         const stamp = new Date().toISOString()

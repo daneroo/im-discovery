@@ -36,21 +36,25 @@ PeerId.createFromJSON(require('./peer-id-listener'), (err, idListener) => {
     })
 
     nodeListener.handle('/chat/1.0.0', (protocol, conn) => {
+      // from pushable to connection
       pull(
         p,
         conn
       )
 
+      // from connection to local echo
       pull(
         conn,
         pull.map((data) => {
           return data.toString('utf8').replace('\n', '')
         }),
-        pull.drain(log('<<'))
+        pull.drain(log('<<'), () => {
+          console.log('*** DONE ***')
+        })
       )
 
       // heartbeat
-      const randInterval = Math.floor(Math.random() * 2000 + 1000)
+      const randInterval = Math.floor(Math.random() * 2000 + 5000)
       log('==')(`pinging at interval: ${randInterval}`)
       setInterval(() => {
         const stamp = new Date().toISOString()
