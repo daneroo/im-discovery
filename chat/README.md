@@ -1,6 +1,7 @@
 # Chat example with libp2p (ipfs)
 
-- eliminate exception (`Error: underlying socket has been closed`)
+- ~~eliminate exception (`Error: underlying socket has been closed`)~~
+- ~~handle errors~~
 - handle reconnection
 - as symmetric as posible
 

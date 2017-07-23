@@ -56,6 +56,8 @@ async.parallel([
   peerListener.multiaddrs.add('/ip4/127.0.0.1/tcp/10333')
   nodeDialer.start((err) => {
     if (err) {
+      log('!!')('start:handle error')
+      console.log(err)
       throw err
     }
 
@@ -67,6 +69,8 @@ async.parallel([
 
     nodeDialer.swarm.dial(peerListener, '/chat/1.0.0', (err, conn) => {
       if (err) {
+        log('!!')('dial:handle error')
+        console.log(err)
         throw err
       }
       console.log('nodeA dialed to nodeB on protocol: /chat/1.0.0')
@@ -84,9 +88,9 @@ async.parallel([
         pull.map((data) => {
           return data.toString('utf8').replace('\n', '')
         }),
-        pull.drain(log('<<'), () => {
+        pull.drain(log('<<')/*, () => {
           console.log('*** DONE ***')
-        })
+        } */)
       )
 
       // heartbeat
