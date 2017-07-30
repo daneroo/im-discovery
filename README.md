@@ -2,9 +2,23 @@
 
 ## TODO
 - two nodes with pubsub
+- see node version of: https://github.com/ipfs-shipyard/ipfs-pubsub-room
+- see web demo: https://github.com/ipfs-shipyard/ipfs-pubsub-room-demo
 - structure with [aegir](https://github.com/ipfs/aegir)
 
+## run from node on OSX
+- seems to hang after about 260s
+- will not start witn ipfs v0.25* (ppined to ^0.24.1)
+- creates a repo on startup in `ipfs-test-xxrandomxx`
+
+## Test
+Simply stole the tests from `ipfs-pubsub-room`.
+```
+npm test
+```
+
 ## Docker
+`ipfs-pubsub-room` does not work with docker.
 ```
 docker build -t disco .
 docker run --rm -it --name disco1 disco
@@ -27,7 +41,6 @@ echo "I <3 IPFS -$(whoami)@$(hostname) $(date -Iseconds)" >content
 hash=$(jsipfs add content|cut -d\  -f 2)
 echo curl "https://ipfs.io/ipfs/$hash"
 curl "https://ipfs.io/ipfs/$hash"
-
 ```
 
 ## References
