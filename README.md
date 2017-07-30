@@ -1,7 +1,8 @@
 # Exploration of ipfs and libp2p discovery
 
 ## TODO
-- two nodes with pubsub
+- make work under docker (node-wrtc is failing)
+  - see this for working travis build https://travis-ci.org/js-platform/node-webrtc
 - see node version of: https://github.com/ipfs-shipyard/ipfs-pubsub-room
 - see web demo: https://github.com/ipfs-shipyard/ipfs-pubsub-room-demo
 - structure with [aegir](https://github.com/ipfs/aegir)

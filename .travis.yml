@@ -1,0 +1,29 @@
+language: node_js
+# trying to get node-wrtc to work (in docker)
+# copied this file from https://raw.githubusercontent.com/js-platform/node-webrtc/develop/.travis.yml
+
+os:
+  - linux
+  - osx
+
+node_js:
+  - "8"
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
+
+notifications:
+  email: false
+
+install:
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+      export CXX=g++-4.8;
+    fi
+  - npm install
+
+script:
+  - npm test
