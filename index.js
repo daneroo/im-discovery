@@ -30,8 +30,6 @@ const ipfsOptions = {
   }
 }
 const ipfs = new IPFS(ipfsOptions)
-const topic = 'scrobblcast-room-test'
-const room = Room(ipfs, topic)
 
 function short (idStr) {
   return idStr.substr(0, 6)
@@ -41,44 +39,61 @@ function log (...args) {
   console.log(new Date().toISOString(), `+${elapsed}`, short(ipfsId), ...args)
 }
 
-ipfs.on('init', () => { log('init') })
+ipfs.on('init', () => { log('ipfs::init') })
 
 ipfs.once('ready', async () => {
   const id = await ipfs.id()
   ipfsId = id.id
-  log('ready')
+  log('ipfs::ready')
 })
+ipfs.on('error', (err) => { log('ipfs::error', err) })
+ipfs.on('start', async () => { log('ipfs::start') })
+ipfs.on('stop', () => { log('ipfs::stop') })
 
-ipfs.on('error', (err) => { log('error', err) })
+async function startRoom (topic) {
+  const room = Room(ipfs, topic)
+  room.on('stop', (message) => { log(`stop::${topic}`) })
+  room.on('error', (err) => { log(`error:::${topic}`, err) })
+  room.on('warning', (err) => { log(`warning:::${topic}`, err) })
+  room.on('subscribed', (topic) => { log('room::subscribed', topic) })
 
-ipfs.on('start', async () => {     // Node has started
-  log('start')
-})
+  room.on('peer joined', (id) => { log(`peer joined::${topic}`, short(id)) })
+  room.on('peer left', (id) => { log(`peer left::${topic}`, short(id)) })
 
-ipfs.on('stop', () => {
-  log('stop')
-})
+  room.on('message', (message) => {
+    log(`message::${topic} from:${short(message.from)} : ${message.data.toString()}`)
+  })
 
-room.on('stop', (message) => { log('room::stop') })
-room.on('error', (err) => { log('room::error', err) })
-room.on('warning', (err) => { log('room::warning', err) })
-room.on('subscribed', (topic) => { log('room::subscribed', topic) })
+  const clearPing = setInterval(() => room.broadcast('ping'), 2000)
 
-room.on('peer joined', (id) => { log('room::peer joined:', short(id)) })
-room.on('peer left', (id) => { log('room::peer left:', short(id)) })
+  const clearPeers = setInterval(showPeers, 5000)
+  function showPeers () {
+    const peers = room.getPeers()
+    log(`|peers::${topic}|=${peers.length} [${peers.map(short).join(',')}]`)
+  }
 
-room.on('message', (message) => {
-  log('room::message from ' + short(message.from) + ': ' + message.data.toString())
-})
+  const leaveAndClear = () => {
+    log(`Leaving room ${topic}`)
+    clearTimeout(clearPing)
+    clearTimeout(clearPeers)
+    room.leave()
+  }
 
-setInterval(() => room.broadcast('ping'), 2000)
-
-setInterval(showPeers, 5000)
-function showPeers () {
-  const peers = room.getPeers()
-  log(`|peers|=${peers.length} [${peers.map(short).join(',')}]`)
+  // setTimeout(leaveAndClear, 20000)
 }
 
+const topic = 'im-scrbl'
+setTimeout(() => { startRoom(`${topic}-1`) }, 5000) // [5-25]
+// setTimeout(() => { startRoom(`${topic}-2`) }, 30000) // [30-40]
+
+// -=-=-= shut things down
+// This causes an exception, wether I start rooms or not...
+// AssertionError [ERR_ASSERTION]: FloodSub is not started
+//     at FloodSub.unsubscribe (/Users/daniellauzon/Code/iMetrical/im-discovery/node_modules/libp2p-floodsub/src/index.js:328:5)
+
+// setTimeout(() => { ipfs.stop() }, 50000) // [0-50]
+
+// -=-=-=-=-=-=-=
 //  This was my own hand rolled pubsub code
 // await ipfs.pubsub.subscribe('scrobble', {}, (msg) => {
 //   // {from: string, seqno: Buffer, data: Buffer, topicCIDs: Array<string>}

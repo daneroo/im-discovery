@@ -4,6 +4,8 @@
   - master: [![Build Status](https://travis-ci.org/daneroo/scrobbleCast.svg?branch=master)](https://travis-ci.org/daneroo/scrobbleCast)
 
 ## TODO
+- bring room up and down
+- clean shutdown of ipfs
 - make work under docker (node-wrtc is failing)
   - see this for working travis build https://travis-ci.org/js-platform/node-webrtc
 - see node version of: https://github.com/ipfs-shipyard/ipfs-pubsub-room
