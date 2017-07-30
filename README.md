@@ -1,5 +1,8 @@
 # Exploration of ipfs and libp2p discovery
 
+- Travis:
+  - master: [![Build Status](https://travis-ci.org/daneroo/scrobbleCast.svg?branch=master)](https://travis-ci.org/daneroo/scrobbleCast)
+
 ## TODO
 - make work under docker (node-wrtc is failing)
   - see this for working travis build https://travis-ci.org/js-platform/node-webrtc
