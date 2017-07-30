@@ -1,5 +1,5 @@
 language: node_js
-# trying to get node-wrtc to work (in docker)
+# trying to get node-wrtc to work (in docker later)
 # copied this file from https://raw.githubusercontent.com/js-platform/node-webrtc/develop/.travis.yml
 
 os:
