@@ -12,7 +12,10 @@ const Room = require('ipfs-pubsub-room')
 
 let ipfsId = 'Qm00000000000'
 const start = +new Date()
-const repoPath = '/tmp/ipfs-test-' + Math.random().toString().substring(2, 8)
+
+// const repoPath = '/tmp/ipfs-test-' + Math.random().toString().substring(2, 8)
+// just 1 of 10 to avoid accumulating files in /tmp/ipfs-test-XX
+const repoPath = '/tmp/ipfs-test-' + Math.floor(Math.random() * 10) % 10
 log('repo', repoPath)
 const repo = new IPFSRepo(repoPath)
 
@@ -91,7 +94,8 @@ async function startRoom (topic) {
 }
 
 const topic = 'im-scrbl'
-startRoom(`${topic}`)
+setTimeout(() => { startRoom(`${topic}`) }, 3000)
+
 // setTimeout(() => { startRoom(`${topic}-1`) }, 5000) // [5-25]
 // setTimeout(() => { startRoom(`${topic}-2`) }, 30000) // [30-40]
 
