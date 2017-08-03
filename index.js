@@ -3,6 +3,11 @@ const IPFS = require('ipfs')
 const IPFSRepo = require('ipfs-repo')
 const Room = require('ipfs-pubsub-room')
 
+// const wrtc = require('wrtc') // or require('electron-webrtc')()
+// const wrtc = require('electron-webrtc')() // or require('wrtc')
+// const WStar = require('libp2p-webrtc-star')
+// const wstar = new WStar({ wrtc: wrtc })
+
 // const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 let ipfsId = 'Qm00000000000'
@@ -28,6 +33,12 @@ const ipfsOptions = {
   EXPERIMENTAL: {
     pubsub: true
   }
+  // libp2p: { // add custom modules to the libp2p stack of your node
+  //   modules: {
+  //     transport: [wstar],
+  //     discovery: [wstar.discovery]
+  //   }
+  // }
 }
 const ipfs = new IPFS(ipfsOptions)
 
@@ -64,26 +75,24 @@ async function startRoom (topic) {
     log(`message::${topic} from:${short(message.from)} : ${message.data.toString()}`)
   })
 
-  const clearPing = setInterval(() => room.broadcast('ping'), 2000)
-
-  const clearPeers = setInterval(showPeers, 5000)
+  /* const clearPing =  */ setInterval(() => room.broadcast('ping'), 1000)
+  /* const clearPeers = */ setInterval(showPeers, 5000)
   function showPeers () {
     const peers = room.getPeers()
     log(`|peers::${topic}|=${peers.length} [${peers.map(short).join(',')}]`)
   }
-
-  const leaveAndClear = () => {
-    log(`Leaving room ${topic}`)
-    clearTimeout(clearPing)
-    clearTimeout(clearPeers)
-    room.leave()
-  }
-
+  // const leaveAndClear = () => {
+  //   log(`Leaving room ${topic}`)
+  //   clearTimeout(clearPing)
+  //   clearTimeout(clearPeers)
+  //   room.leave()
+  // }
   // setTimeout(leaveAndClear, 20000)
 }
 
 const topic = 'im-scrbl'
-setTimeout(() => { startRoom(`${topic}-1`) }, 5000) // [5-25]
+startRoom(`${topic}`)
+// setTimeout(() => { startRoom(`${topic}-1`) }, 5000) // [5-25]
 // setTimeout(() => { startRoom(`${topic}-2`) }, 30000) // [30-40]
 
 // -=-=-= shut things down
