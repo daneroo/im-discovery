@@ -4,6 +4,8 @@
   - master: [![Build Status](https://travis-ci.org/daneroo/scrobbleCast.svg?branch=master)](https://travis-ci.org/daneroo/scrobbleCast)
 
 ## TODO
+- refactor into single long running process (with n children), and monitor the chilren
+  - https://github.com/foreverjs/forever-monitor
 - bring room up and down
 - clean shutdown of ipfs
 - make work under docker (node-wrtc is failing)

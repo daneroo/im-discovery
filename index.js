@@ -1,12 +1,5 @@
-
-const IPFS = require('ipfs')
-const IPFSRepo = require('ipfs-repo')
-const Room = require('ipfs-pubsub-room')
-
-// const wrtc = require('wrtc') // or require('electron-webrtc')()
-// const wrtc = require('electron-webrtc')() // or require('wrtc')
-// const WStar = require('libp2p-webrtc-star')
-// const wstar = new WStar({ wrtc: wrtc })
+var cluster = require('cluster')
+const node = require('./lib/node')
 
 // const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 const argv = require('yargs')
@@ -15,120 +8,61 @@ const argv = require('yargs')
   .argv
 
 const processUniqueId = argv.id
-let ipfsId = 'Qm00000000000'
-const start = +new Date()
 
-// TODO, just check for lock...
-const repoPath = `./data/ipfs-test-${processUniqueId}`
-log('repo', repoPath)
-const repo = new IPFSRepo(repoPath)
+if (cluster.isWorker) {
+  console.log('Worker ' + process.pid + ' has started.')
+  node.start(processUniqueId)
 
-const ipfsOptions = {
-  repo: repo,
-  config: {
-    Addresses: {
-      Swarm: [
-        '/libp2p-webrtc-star/dns4/star-signal.cloud.ipfs.team/wss'
-      ]
-    },
-    Discovery: {
-      webRTCStar: {
-        Enabled: true
-      }
+  // Send message to master process.
+  process.send({msgFromWorker: `This is from worker ${process.pid}`})
+
+  // Receive messages from the master process.
+  process.on('message', function (msg) {
+    console.log('Worker ' + process.pid + ' received message from master.', msg)
+    if (msg.seqno) {
+      process.send({msgFromWorker: `Acknowledged sequence from worker ${process.pid}`, seqno: msg.seqno})
     }
-  },
-  EXPERIMENTAL: {
-    pubsub: true
-  }
-  // libp2p: { // add custom modules to the libp2p stack of your node
-  //   modules: {
-  //     transport: [wstar],
-  //     discovery: [wstar.discovery]
-  //   }
-  // }
-}
-const ipfs = new IPFS(ipfsOptions)
-
-function short (idStr) {
-  return idStr.substr(0, 6)
-}
-function log (...args) {
-  const elapsed = Math.floor((+new Date() - start) / 1000)
-  console.log(new Date().toISOString(), `+${elapsed}`, short(ipfsId), ...args)
-}
-
-ipfs.on('init', () => { log('ipfs::init') })
-
-ipfs.once('ready', async () => {
-  const id = await ipfs.id()
-  ipfsId = id.id
-  log('ipfs::ready')
-})
-ipfs.on('error', (err) => { log('ipfs::error', err) })
-ipfs.on('start', async () => { log('ipfs::start') })
-ipfs.on('stop', () => { log('ipfs::stop') })
-
-async function startRoom (topic) {
-  const room = Room(ipfs, topic)
-  room.on('stop', (message) => { log(`stop::${topic}`) })
-  room.on('error', (err) => { log(`error:::${topic}`, err) })
-  room.on('warning', (err) => { log(`warning:::${topic}`, err) })
-  room.on('subscribed', (topic) => { log('room::subscribed', topic) })
-
-  room.on('peer joined', (id) => { log(`peer joined::${topic}`, short(id)) })
-  room.on('peer left', (id) => { log(`peer left::${topic}`, short(id)) })
-
-  room.on('message', (message) => {
-    log(`message::${topic} from:${short(message.from)} : ${message.data.toString()}`)
   })
-
-  /* const clearPing =  */ setInterval(() => room.broadcast('ping'), 1000)
-  /* const clearPeers = */ setInterval(showPeers, 5000)
-  function showPeers () {
-    const peers = room.getPeers()
-    log(`|peers::${topic}|=${peers.length} [${peers.map(short).join(',')}]`)
-  }
-  // const leaveAndClear = () => {
-  //   log(`Leaving room ${topic}`)
-  //   clearTimeout(clearPing)
-  //   clearTimeout(clearPeers)
-  //   room.leave()
-  // }
-  // setTimeout(leaveAndClear, 20000)
 }
 
-setTimeout(() => { log('monitor: still alive') }, 10000)
-const topic = 'im-scrbl'
-setTimeout(() => { startRoom(`${topic}`) }, 3000)
+if (cluster.isMaster) {
+  console.log('Master ' + process.pid + ' has started.')
 
-// setTimeout(() => { startRoom(`${topic}-1`) }, 5000) // [5-25]
-// setTimeout(() => { startRoom(`${topic}-2`) }, 30000) // [30-40]
+  // Fork workers.
+  const numWorkers = 1
+  for (var i = 0; i < numWorkers; i++) {
+    var worker = cluster.fork()
 
-// -=-=-= shut things down
-// This causes an exception, wether I start rooms or not...
-// AssertionError [ERR_ASSERTION]: FloodSub is not started
-//     at FloodSub.unsubscribe (/Users/daniellauzon/Code/iMetrical/im-discovery/node_modules/libp2p-floodsub/src/index.js:328:5)
+    var sentSequenceNumber = 0
+    var receivedSequenceNumber = 0
+    // Receive messages from this worker and handle them in the master process.
+    worker.on('message', function (msg) {
+      console.log('Master ' + process.pid + ' received message from worker ' + this.process.pid + '.', msg)
+      if (msg.seqno) {
+        receivedSequenceNumber = msg.seqno
+      }
+    })
+    // Receive errors from this worker process (as when worker.send() encounters an error)
+    worker.on('error', function (msg) {
+      console.log('Master ' + process.pid + ' received error from worker ' + this.process.pid + '.', msg)
+    })
 
-// setTimeout(() => { ipfs.stop() }, 50000) // [0-50]
+    // Send a message from the master process to the worker.
+    setInterval(() => {
+      console.log(`Master will send message to worker ${worker.process.pid} isDead:${worker.isDead()} sent:${sentSequenceNumber} recvd:${receivedSequenceNumber}`)
+      if (sentSequenceNumber > receivedSequenceNumber) {
+        console.log(`Master should exit or respawn after killing worker ${worker.process.pid}`)
+        process.exit(1)
+      }
+      worker.send({
+        seqno: ++sentSequenceNumber,
+        msgFromMaster: 'This is from master ' + process.pid + ' to worker ' + worker.process.pid + '.'
+      })
+    }, 10000)
+  }
 
-// -=-=-=-=-=-=-=
-//  This was my own hand rolled pubsub code
-// await ipfs.pubsub.subscribe('scrobble', {}, (msg) => {
-//   // {from: string, seqno: Buffer, data: Buffer, topicCIDs: Array<string>}
-//   const from = msg.from()
-//   log(`subscribe: from ${from}`)
-// })
-// log(`+subscribed (${id.id})`)
-
-// setInterval(showSwarm, 5000)
-// async function showSwarm () {
-//   log('-swarm')
-//   const peers = await ipfs.swarm.peers()
-//   log(`|peers|=${peers.length}`)
-//   for (let peer of peers) {
-//     const id = peer.peer.id.toB58String()
-//     const addr = peer.addr.toString()
-//     log(` peer: ${addr} (${id})`)
-//   }
-//   log('+swarm')
-// }
+  // Be notified when worker processes die.
+  cluster.on('death', function (worker) {
+    console.log('Worker ' + worker.process.pid + ' died.')
+  })
+}
