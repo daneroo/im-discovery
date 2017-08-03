@@ -16,6 +16,12 @@
 - seems to hang after about 260s
 - will not start witn ipfs v0.25* (ppined to ^0.24.1)
 - creates a repo on startup in `ipfs-test-xxrandomxx`
+```
+# - potentially on same machine, with more than one node
+node index.js --id one
+node index.js --id 2
+while true; do node index.js --id first; sleep 1; done
+```
 
 ## Test
 Simply stole the tests from `ipfs-pubsub-room`.

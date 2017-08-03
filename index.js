@@ -9,13 +9,17 @@ const Room = require('ipfs-pubsub-room')
 // const wstar = new WStar({ wrtc: wrtc })
 
 // const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+const argv = require('yargs')
+  .usage('Usage: $0 [--id [unique-on-host]]')
+  .default('id', Math.random().toString().substring(2, 8))
+  .argv
 
+const processUniqueId = argv.id
 let ipfsId = 'Qm00000000000'
 const start = +new Date()
 
-// const repoPath = '/tmp/ipfs-test-' + Math.random().toString().substring(2, 8)
-// just 1 of 10 to avoid accumulating files in /tmp/ipfs-test-XX
-const repoPath = '/tmp/ipfs-test-' + Math.floor(Math.random() * 10) % 10
+// TODO, just check for lock...
+const repoPath = `./data/ipfs-test-${processUniqueId}`
 log('repo', repoPath)
 const repo = new IPFSRepo(repoPath)
 
@@ -93,6 +97,7 @@ async function startRoom (topic) {
   // setTimeout(leaveAndClear, 20000)
 }
 
+setTimeout(() => { log('monitor: still alive') }, 10000)
 const topic = 'im-scrbl'
 setTimeout(() => { startRoom(`${topic}`) }, 3000)
 
