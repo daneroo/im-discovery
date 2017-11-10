@@ -1,11 +1,9 @@
 # Exploration of ipfs and libp2p discovery
 
-- Travis:
-  - master: [![Build Status](https://travis-ci.org/daneroo/scrobbleCast.svg?branch=master)](https://travis-ci.org/daneroo/scrobbleCast)
-
 ## TODO
-- refactor into single long running process (with n children), and monitor the chilren
-  - https://github.com/foreverjs/forever-monitor
+- Does not work in docker
+- does not work in workers.js (cluster)
+- tests are broken
 - bring room up and down
 - clean shutdown of ipfs
 - make work under docker (node-wrtc is failing)
@@ -15,14 +13,10 @@
 - structure with [aegir](https://github.com/ipfs/aegir)
 
 ## run from node on OSX
-- seems to hang after about 260s
-- will not start witn ipfs v0.25* (ppined to ^0.24.1)
-- creates a repo on startup in `ipfs-test-xxrandomxx`
 ```
 # - potentially on same machine, with more than one node
-node index.js --id one
-node index.js --id 2
-while true; do node index.js --id first; sleep 1; done
+node index.js 
+node index.js 
 ```
 
 ## Test

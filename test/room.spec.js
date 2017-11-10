@@ -22,7 +22,7 @@ const ipfsOptions = {
   config: {
     Addresses: {
       Swarm: [
-        '/libp2p-webrtc-star/dns4/star-signal.cloud.ipfs.team/wss'
+        '/dns4/star-signal.cloud.ipfs.team/wss/p2p-webrtc-star'
       ]
     },
     Discovery: {
