@@ -1,0 +1,21 @@
+{
+  "name": "dat-discovery",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index",
+    "test": "mocha --recursive test/"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "discovery-swarm": "^4.4.2"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "dirty-chai": "^2.0.1",
+    "mocha": "^4.0.1",
+    "standard": "^10.0.3"
+  }
+}
