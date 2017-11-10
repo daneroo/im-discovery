@@ -1,5 +1,9 @@
 # Exploration of ipfs and libp2p discovery
 
+- Successfully run for > 1000s on three processes, two (local) hosts
+- Works for peers on same machine (although not cluster??)
+- Works for nodes on local network
+
 ## TODO
 - Does not work in docker
 - does not work in workers.js (cluster)
