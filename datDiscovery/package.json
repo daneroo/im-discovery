@@ -1,7 +1,7 @@
 {
   "name": "dat-discovery",
   "version": "1.0.0",
-  "description": "",
+  "description": "Discovery with datproject's discovery-swarm",
   "main": "index.js",
   "scripts": {
     "start": "node index",

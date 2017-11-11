@@ -3,8 +3,12 @@ const swarm = require('discovery-swarm')
 const start = +new Date()
 const topic = 'imetrical' // can be any id/name/hash
 const sw = swarm()
-// sw.leave()
-// sw.listen(8989) // Listen on a specific port. Should be called before add
+
+// Listen doesn't seem to affect port I'm listening to....
+// if (process.env.PORT) {
+//   log(`Started swarm, listening on ${process.env.PORT}`)
+//   sw.listen(Number(process.env.port)) // Listen on a specific port. Should be called before add
+// }
 
 log(`Started swarm, joining topic ${topic}`)
 sw.join(topic)
