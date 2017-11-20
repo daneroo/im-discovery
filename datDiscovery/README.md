@@ -5,7 +5,7 @@ Investigating the discovery mechanism under [datproject](https://datproject.org/
 which is using [discovery-swarm](https://github.com/mafintosh/discovery-swarm)
 
 - Works from local network, e.g. dirac(x2),shannon
-- Work with remote, but connection order seems fragile
+- Work with remote (digital ocean), but connection order seems fragile
 - docker need some PORT magic...
 
 
